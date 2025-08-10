@@ -15,9 +15,13 @@ env:
     
 jobs:
       
-  docker-build-upload:        
-    name: 'Docker build'      
+  docker-build-upload-terraform-ecs:        
+    name: 'Docker build, terraform ECS'      
     runs-on: ubuntu-latest
+          
+    permissions:
+      contents: read
+      id-token: write          
           
     steps:          
 
@@ -49,29 +53,7 @@ jobs:
           ECR_REPOSITORY_URI: ${{ env.ECR_REPOSITORY_URI }}
         run: |       
           docker build -t $ECR_REPOSITORY_URI:latest .
-          docker push $ECR_REPOSITORY_URI:latest
-          
-  terraform:
-
-    name: 'Terraform'
-    needs: docker-build-upload
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-    
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}      
+          docker push $ECR_REPOSITORY_URI:latest          
         
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -131,8 +113,8 @@ jobs:
       - name: Terraform Apply      
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
-          ECR_REPOSITORY_URI: ${{ env.ECR_REPOSITORY_URI }}
-        run: terraform apply -var="docker_nginx_image=${{ env.ECR_REPOSITORY_URI }}:latest" -auto-approve -input=false     
+          TF_VAR_docker_nginx_image: ${{ env.ECR_REPOSITORY_URI }}
+        run: terraform apply -auto-approve -input=false     
 
       - name: Get Load Balancer URL
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
