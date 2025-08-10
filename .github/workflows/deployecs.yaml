@@ -102,7 +102,7 @@ jobs:
         echo "Load Balancer URL: $LB_URL"
         
     - name: Test Application
-      if: github.ref == "refs/heads/main" && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
         echo "Waiting for ECS service to be stable..."
         sleep 60
