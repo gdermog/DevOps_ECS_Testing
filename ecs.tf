@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "pospisilv_lesson7" {
   container_definitions = jsonencode([
     {
       name      = "nginx"
-      image     = "nginx:latest"
+      image     = var.docker_nginx_image
       portMappings = [
         {
           containerPort = 80
