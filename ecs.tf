@@ -68,7 +68,7 @@ resource "aws_ecs_service" "pospisilv_lesson7" {
 
   load_balancer {
       target_group_arn = aws_lb_target_group.nginx.arn
-      container_name   = "web"
+      container_name   = "nginx"
       container_port   = 80
   }
   
