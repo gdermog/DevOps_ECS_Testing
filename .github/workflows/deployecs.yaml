@@ -131,7 +131,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           ECR_REPOSITORY_URI: ${{ env.ECR_REPOSITORY_URI }}
-        run: terraform apply -var="docker_nginx_image=$ECR_REPOSITORY_URI:latest" -auto-approve -input=false     
+        run: terraform apply -var="docker_nginx_image=${{ env.ECR_REPOSITORY_URI }}:latest" -auto-approve -input=false     
 
       - name: Get Load Balancer URL
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -147,12 +147,12 @@ jobs:
           echo "Waiting for ECS service to be stable..."
           sleep 60
           echo "Testing application availability..."
-          for i in {1..10}; do
+          for i in {1..4}; do
             if curl -f "${{ steps.lb_url.outputs.url }}"; then
               echo "Application is responding!"
               break
             else
-              echo "Attempt \$i failed, retrying in 30 seconds..."
+              echo "Attempt $i failed, retrying in 30 seconds..."
               sleep 30
             fi
           done        
